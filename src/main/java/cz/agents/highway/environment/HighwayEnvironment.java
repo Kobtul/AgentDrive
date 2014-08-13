@@ -16,6 +16,7 @@ import cz.agents.highway.protobuf.factory.simplan.PlansFactory;
 import cz.agents.highway.protobuf.factory.simplan.UpdateFactory;
 import cz.agents.highway.protobuf.generated.dlr.DLR_MessageContainer;
 import cz.agents.highway.protobuf.generated.simplan.MessageContainer;
+import cz.agents.highway.vanet.Vanet;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.common.entity.Entity;
@@ -54,6 +55,8 @@ public class HighwayEnvironment extends EventBasedEnvironment {
     private Communicator communicator;
     private HighwayStorage storage;
     private Network roadNetwork;
+
+    private Vanet vanet;
 
     // [DEBUG]
     int counter = 0;
@@ -224,6 +227,7 @@ public class HighwayEnvironment extends EventBasedEnvironment {
                     	time = System.currentTimeMillis();
                     	
                         logger.debug("Received RadarData");
+                        vanet.updateObjects(object);
                         storage.updateCars(object);
 
                     }
@@ -236,6 +240,10 @@ public class HighwayEnvironment extends EventBasedEnvironment {
 
     public HighwayStorage getStorage() {
         return storage;
+    }
+
+    public Vanet getVanet() {
+        return vanet;
     }
 
     public Communicator getCommunicator() {
