@@ -84,6 +84,9 @@ public class HighwayEnvironment extends EventBasedEnvironment {
 
         storage = new HighwayStorage(this);
         logger.info("Initialized handler and storages");
+        vanet = new Vanet(this);
+        logger.info("Initialized handler and Vanet");
+
 
         final PlansOut plans = new PlansOut();
 
@@ -228,7 +231,7 @@ public class HighwayEnvironment extends EventBasedEnvironment {
                     	
                         logger.debug("Received RadarData");
                         vanet.updateObjects(object);
-                        storage.updateCars(object);
+                        storage.updateCars(object, vanet.distributeStates());
 
                     }
                 }

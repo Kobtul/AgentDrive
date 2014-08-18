@@ -1,5 +1,6 @@
 package cz.agents.highway.storage;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import cz.agents.alite.configurator.Configurator;
 import cz.agents.highway.agent.ORCAAgent;
 import cz.agents.highway.agent.RouteAgent;
 import cz.agents.highway.environment.HighwayEnvironment;
+import cz.agents.highway.vanet.Status;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.common.event.Event;
@@ -44,7 +46,7 @@ public class HighwayStorage extends EventBasedStorage {
         }else if(event.isType(HighwayEventType.RADAR_DATA)){
             logger.debug("HighwayStorage: handled: RADAR_DATA");
             RadarData radar_data = (RadarData) event.getContent();
-            updateCars(radar_data);
+            updateCars(radar_data, null);
         }
 
     }
@@ -102,10 +104,11 @@ public class HighwayStorage extends EventBasedStorage {
         return actions;
     }
 
-    public void updateCars(RadarData object) {
+    public void updateCars(RadarData object, LinkedHashMap<Integer, Collection<Status>> states) {
         for (RoadObject car : object.getCars()) {
             updateCar(car);
         }
+        updateVanetPartOfCar(states);
         logger.debug("HighwayStorage updated vehicles: received " + object);
         getEventProcessor().addEvent(HighwayEventType.UPDATED, null, null, null);
     }
@@ -114,4 +117,10 @@ public class HighwayStorage extends EventBasedStorage {
 //        getRoadDescription().addPoints(init.getPoints());
 //
 //    }
+
+    public void updateVanetPartOfCar(LinkedHashMap<Integer, Collection<Status>> states){
+        for (Integer carID : states.keySet()) {
+            posCurr.get(carID).setReceivedStates(states.get(carID));
+        }
+    }
 }

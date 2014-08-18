@@ -1,9 +1,14 @@
 package cz.agents.highway.storage;
 
+import cz.agents.highway.vanet.CommunicationInterface;
+import cz.agents.highway.vanet.Status;
+import cz.agents.highway.vanet.VanetObject;
+
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
+import java.util.Collection;
 
-public class RoadObject {
+public class RoadObject extends VanetObject{
 
     private int id = -1;
     private double updateTime = -1;
@@ -47,7 +52,22 @@ public class RoadObject {
     @Override
     public String toString() {
         return "RoadObject [id = " + id + ", updateTime=" + updateTime + ", lane=" + lane
-                + ", pos=" + position + ", v=" + velocity + "]";
+                + ", pos=" + position + ", v=" + velocity + "]" + printStates();
     }
+
+    private String printStates(){
+        String statesToPrint = "\n";
+        for (Status st : getStatesOfConnectedObjects()){
+            statesToPrint += st;
+            System.out.println(st);
+        }
+        return statesToPrint;
+    }
+
+    @Override
+    public Status getStatus() {
+        return new Status("Já jsem agent "+getId());
+    }
+
 
 }

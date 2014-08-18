@@ -18,6 +18,7 @@ import cz.agents.highway.storage.RoadObject;
 import cz.agents.highway.storage.plan.Action;
 import cz.agents.highway.storage.plan.PlansOut;
 import cz.agents.highway.storage.plan.WPAction;
+import cz.agents.highway.vanet.Vanet;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -147,6 +148,8 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                 radarData.add(state);
             }
             //send radar-data to storage with duration delay
+
+            highwayEnvironment.getEventProcessor().addEvent(HighwayEventType.RADAR_DATA, highwayEnvironment.getVanet(), null, radarData, Math.max(1, (long) (duration * 1000)));
             highwayEnvironment.getEventProcessor().addEvent(HighwayEventType.RADAR_DATA, highwayEnvironment.getStorage(), null, radarData, Math.max(1, (long) (duration * 1000)));
         }
     }
@@ -185,6 +188,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
         final int size = vehicles.size();
         final int simulatorCount = Configurator.getParamList("highway.dashboard.simulatorsToRun", String.class).size();
         final HighwayStorage storage = highwayEnvironment.getStorage();
+        final Vanet vanet = highwayEnvironment.getVanet();
         Map<Integer, Point2f> initialPositions = reader.getInitialPositions();
 
         if (simulatorCount == 0) {
@@ -193,6 +197,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
             Iterator<Integer> vehicleIt = vehicles.iterator();
             RadarData update = new RadarData();
             Map<Integer, Agent> agents = storage.getAgents();
+
 
             // Iterate over all configured vehicles
             for (int i = 0; i < size; i++) {
@@ -225,7 +230,9 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
 
             }
             simulatorHandlers.add(new LocalSimulatorHandler(null, new HashSet<Integer>(vehicles)));
-            storage.updateCars(update);
+
+            vanet.updateObjects(update);
+            storage.updateCars(update, vanet.distributeStates());
         }
 
         // Divide vehicles evenly to the simulators
@@ -268,7 +275,6 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
 
 
                     if (i < section * size / simulatorCount && i >= (section - 1) * size / simulatorCount) {
-                        logger.info("OndraTest - created car " + new WPAction(vehicleID, 0d, initialPosition, initialVelocity.length()));
                         plans.addAction(new WPAction(vehicleID, 0d, initialPosition, initialVelocity.length()));
                         plannedVehicles.add(vehicleID);
                     } else {
