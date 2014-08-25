@@ -39,14 +39,14 @@ public class VanetVisLayer extends CommonLayer{
     
     @Override
     public void paint(Graphics2D canvas) {
-        BasicStroke stroke = new BasicStroke(1,
-                BasicStroke.CAP_BUTT,
+        BasicStroke stroke = new BasicStroke(0.2f,
+                BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_ROUND,
-                1.0f,
-                new float[]{2f, 0f, 2f},
-                2f);
+                1f,
+                new float[] {2f},
+                0f);
         canvas.setStroke(stroke);
-        canvas.setColor(Color.cyan);
+        canvas.setColor(Color.white);
         for (RoadObject object : vanet.getIncludedObjects().values()){
             for (RoadObject another : vanet.getConnectedObjects().get(object.getId())){
                 AffineTransform t = canvas.getTransform();

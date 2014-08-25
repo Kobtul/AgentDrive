@@ -113,6 +113,12 @@ public class HighwayStorage extends EventBasedStorage {
         getEventProcessor().addEvent(HighwayEventType.UPDATED, null, null, null);
     }
 
+    private void useVanetInformation() {
+        for(RoadObject object : posCurr.values()){
+            object.useStates();
+        }
+    }
+
 //    public void updateInit(InitIn init) {
 //        getRoadDescription().addPoints(init.getPoints());
 //

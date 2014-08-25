@@ -18,10 +18,10 @@ import java.util.List;
  */
 public class RouteAgent extends Agent {
     ///
-    private static final float WAYPOINT_DISTANCE = 3.0f;
-    private static float MAX_SPEED = 20;
+    public static final float WAYPOINT_DISTANCE = 3.0f;
+    public static float MAX_SPEED = 20;
 
-    private static final float WP_COUNT_CONST = 0.2f;
+    public static final float WP_COUNT_CONST = 0.2f;
 
 
     @Override

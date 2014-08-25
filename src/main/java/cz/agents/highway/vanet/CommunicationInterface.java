@@ -23,4 +23,8 @@ public interface CommunicationInterface {
     * Procedure to save states of connected object
     * */
     public void setReceivedStates(Collection<Status> states);
+    /*
+    *Procedure to use states which the object see
+     */
+    public void useStates();
 }

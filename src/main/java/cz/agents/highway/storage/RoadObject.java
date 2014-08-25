@@ -52,11 +52,12 @@ public class RoadObject extends VanetObject{
     @Override
     public String toString() {
         return "RoadObject [id = " + id + ", updateTime=" + updateTime + ", lane=" + lane
-                + ", pos=" + position + ", v=" + velocity + "]" + printStates();
+                + ", pos=" + position + ", v=" + velocity + "]";
+
     }
 
     private String printStates(){
-        String statesToPrint = "\n";
+        String statesToPrint = "";
         for (Status st : getStatesOfConnectedObjects()){
             statesToPrint += st;
             System.out.println(st);
@@ -66,8 +67,18 @@ public class RoadObject extends VanetObject{
 
     @Override
     public Status getStatus() {
-        return new Status("Já jsem agent "+getId());
+       Status status = new Status();
+        status.setID(getId());
+        status.setPosition(getPosition());
+        status.setVelocity(getVelocity());
+        return status;
     }
 
+    @Override
+    public void useStates() {
+        if(getId() == 6 && !getStatesOfConnectedObjects().isEmpty()){
+            this.velocity = new Vector3f(0,0,0);
+        }
+    }
 
 }

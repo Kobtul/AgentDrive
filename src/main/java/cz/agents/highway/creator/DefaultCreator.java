@@ -77,9 +77,9 @@ public class DefaultCreator implements Creator {
             createVisualization();
             VisManager.registerLayer(new NetLayer(highwayEnvironment.getRoadNetwork()));
             VisManager.registerLayer(ProtobufVisLayer.create(highwayEnvironment.getStorage()));
+            VisManager.registerLayer(new VanetVisLayer(highwayEnvironment.getVanet()));
             VisManager.registerLayer(RoadObjectLayer.create(highwayEnvironment.getStorage().getPosCurr()));
             VisManager.registerLayer(SimulationControlLayer.create(simulation));
-            VisManager.registerLayer(new VanetVisLayer(highwayEnvironment.getVanet()));
         }
         simulation.setSimulationSpeed(simulationSpeed);
  

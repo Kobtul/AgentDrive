@@ -32,4 +32,9 @@ public class VanetObject implements CommunicationInterface {
     public void setReceivedStates(Collection<Status> states) {
         statesOfConnectedObjects = states;
     }
+
+    @Override
+    public void useStates() {
+
+    }
 }
