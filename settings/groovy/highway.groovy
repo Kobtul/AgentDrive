@@ -5,7 +5,8 @@ highway {
     timestep = 10; //ms               //not relevant
 
 //    agent = "SDAgent";
-    agent = "RouteAgent";
+//    agent = "RouteAgent";
+    agent = "V2VAgent";
 //    agent = "ORCAAgent";
 
     net {

@@ -56,7 +56,6 @@ public class DLR_UpdateFactory implements FactoryInterface<RadarData, Message> {
         for (Vehicle_update vu : update.getUpdatesList()) {
             double time = update.getUpdateTime();
             
-            
             Point3f pos = new Point3f((float) vu.getPosX(), (float) vu.getPosY(), (float) vu.getPosZ());
             Vector3f vel = new Vector3f((float) vu.getVelocityX(), (float) vu.getVelocityY(), 0.0f);
             carUpdates.add(new RoadObject(vu.getVehicleId(), time, vu.getLane(), pos, vel));

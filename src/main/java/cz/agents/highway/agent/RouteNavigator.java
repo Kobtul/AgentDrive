@@ -4,10 +4,15 @@ import cz.agents.highway.environment.roadnet.Edge;
 import cz.agents.highway.environment.roadnet.Lane;
 import cz.agents.highway.environment.roadnet.Network;
 import cz.agents.highway.environment.roadnet.XMLReader;
+import cz.agents.highway.storage.RoadObject;
+import cz.agents.highway.storage.plan.Action;
+import cz.agents.highway.storage.plan.WPAction;
 
 import javax.vecmath.Point2f;
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -167,5 +172,94 @@ public class RouteNavigator {
         agentLane = CP_agentLane;
         pointPtr = CP_pointPtr;
         routePtr = CP_routePtr;
+    }
+
+
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Vanet part
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static final float WAYPOINT_DISTANCE = 3.0f;
+    public static float MAX_SPEED = 20;
+    public static final float WP_COUNT_CONST = 0.2f;
+    public static final int MIN_NUM_POINTS = 12;
+
+    public LinkedList<Action> getNextActions(RoadObject me){
+        LinkedList<Action> actions = new LinkedList<Action>();
+        Point2f position2D = new Point2f(me.getPosition().getX(), me.getPosition().getY());
+        List<Point2f> wps = new LinkedList<Point2f>();
+        Point2f waypoint = null;
+
+        int wpCount = Math.max(MIN_NUM_POINTS, (int) (me.getVelocity().length() * WP_COUNT_CONST));
+        setCheckpoint();
+
+        //try to advance navigator closer to the actual position
+        int a = 10;
+        while (a-- > 0 && getRoutePoint().distance(position2D) > WAYPOINT_DISTANCE) {
+            advanceInRoute();
+        }
+        if (getRoutePoint().distance(position2D) > WAYPOINT_DISTANCE) {
+            resetToCheckpoint();
+        } else {
+            setCheckpoint();
+        }
+        waypoint = getRoutePoint();
+
+        for (int i = 0; i < wpCount; i++) {
+            // If the next waypoint is too close, go to the next in route
+            while (waypoint.distance(getRoutePoint()) < WAYPOINT_DISTANCE) {
+                advanceInRoute();
+            }
+            waypoint = getRoutePoint();
+            wps.add(waypoint);
+            actions.add(new WPAction(me.getId(), me.getUpdateTime(),
+                    new Point3f(waypoint.x, waypoint.y, me.getPosition().z), MAX_SPEED));
+        }
+        resetToCheckpoint();
+        return actions;
+    }
+
+    public LinkedList<Action> getNextActionsWithReset(RoadObject me){
+        Lane local_agentLane = agentLane;
+        int local_pointPtr = pointPtr;
+        int local_routePtr = routePtr;
+        LinkedList<Action> actions = new LinkedList<Action>();
+        Point2f position2D = new Point2f(me.getPosition().getX(), me.getPosition().getY());
+        List<Point2f> wps = new LinkedList<Point2f>();
+        Point2f waypoint = null;
+
+        int wpCount = Math.max(MIN_NUM_POINTS, (int) (me.getVelocity().length() * WP_COUNT_CONST));
+        setCheckpoint();
+
+        //try to advance navigator closer to the actual position
+        int a = 10;
+        while (a-- > 0 && getRoutePoint().distance(position2D) > WAYPOINT_DISTANCE) {
+            advanceInRoute();
+        }
+        if (getRoutePoint().distance(position2D) > WAYPOINT_DISTANCE) {
+            resetToCheckpoint();
+        } else {
+            setCheckpoint();
+        }
+        waypoint = getRoutePoint();
+
+        for (int i = 0; i < wpCount; i++) {
+            // If the next waypoint is too close, go to the next in route
+            while (waypoint.distance(getRoutePoint()) < WAYPOINT_DISTANCE) {
+                advanceInRoute();
+            }
+            waypoint = getRoutePoint();
+            wps.add(waypoint);
+            actions.add(new WPAction(me.getId(), me.getUpdateTime(),
+                    new Point3f(waypoint.x, waypoint.y, me.getPosition().z), MAX_SPEED));
+        }
+        resetToCheckpoint();
+        agentLane = local_agentLane;
+        pointPtr = local_pointPtr;
+        routePtr = local_routePtr;
+        return actions;
     }
 }

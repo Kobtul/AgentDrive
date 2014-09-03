@@ -6,18 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import cz.agents.alite.configurator.Configurator;
-import cz.agents.highway.agent.ORCAAgent;
-import cz.agents.highway.agent.RouteAgent;
+import cz.agents.highway.agent.*;
 import cz.agents.highway.environment.HighwayEnvironment;
 import cz.agents.highway.vanet.Status;
+import cz.agents.highway.vanet.Vanet;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.common.event.Event;
 import cz.agents.alite.environment.eventbased.EventBasedEnvironment;
 import cz.agents.alite.environment.eventbased.EventBasedStorage;
 import cz.agents.alite.simulation.SimulationEventType;
-import cz.agents.highway.agent.Agent;
-import cz.agents.highway.agent.SDAgent;
 import cz.agents.highway.storage.plan.Action;
 
 public class HighwayStorage extends EventBasedStorage {
@@ -46,7 +44,7 @@ public class HighwayStorage extends EventBasedStorage {
         }else if(event.isType(HighwayEventType.RADAR_DATA)){
             logger.debug("HighwayStorage: handled: RADAR_DATA");
             RadarData radar_data = (RadarData) event.getContent();
-            updateCars(radar_data, null);
+            updateCars(radar_data);
         }
 
     }
@@ -60,7 +58,7 @@ public class HighwayStorage extends EventBasedStorage {
         posCurr.put(carId, carState);
     }
 
-    public Agent createAgent(final int id) {
+    public Agent createAgent(final int id, Vanet vanet) {
         String agentClassName = Configurator.getParamString("highway.agent", "RouteAgent");
         Agent agent = null;
         if (agentClassName.equals("RouteAgent")) {
@@ -69,6 +67,8 @@ public class HighwayStorage extends EventBasedStorage {
             agent = new SDAgent(id);
         } else if (agentClassName.equals("ORCAAgent")) {
             agent = new ORCAAgent(id);
+        } else if (agentClassName.equals("V2VAgent")) {
+            agent = new V2VAgent(id, vanet);
         }
 
         VehicleSensor sensor = new VehicleSensor(getEnvironment(), agent, this);
@@ -104,29 +104,19 @@ public class HighwayStorage extends EventBasedStorage {
         return actions;
     }
 
-    public void updateCars(RadarData object, LinkedHashMap<Integer, Collection<Status>> states) {
+    public void updateCars(RadarData object) {
         for (RoadObject car : object.getCars()) {
             updateCar(car);
         }
-        updateVanetPartOfCar(states);
         logger.debug("HighwayStorage updated vehicles: received " + object);
         getEventProcessor().addEvent(HighwayEventType.UPDATED, null, null, null);
     }
 
-    private void useVanetInformation() {
-        for(RoadObject object : posCurr.values()){
-            object.useStates();
-        }
-    }
+
 
 //    public void updateInit(InitIn init) {
 //        getRoadDescription().addPoints(init.getPoints());
 //
 //    }
 
-    public void updateVanetPartOfCar(LinkedHashMap<Integer, Collection<Status>> states){
-        for (Integer carID : states.keySet()) {
-            posCurr.get(carID).setReceivedStates(states.get(carID));
-        }
-    }
 }

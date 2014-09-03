@@ -5,11 +5,13 @@ highway {
     timestep = 10; //ms               //not relevant
 
 //    agent = "SDAgent";
-    agent = "RouteAgent";
+//    agent = "RouteAgent";
+    agent = "V2VAgent";
 //    agent = "ORCAAgent";
 
     net {
-        folder = "nets/junction-big/";
+        folder = "nets/x-junction/";
+//        folder = "nets/junction-big/";
 //        folder = "nets/highway-straight/";
     }
     safeDistanceAgent {

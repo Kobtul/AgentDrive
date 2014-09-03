@@ -34,7 +34,6 @@ public class VanetVisLayer extends CommonLayer{
 
     public VanetVisLayer(Vanet vanet){
         this.vanet = vanet;
-        XMLReader.getInstance().read(Configurator.getParamString("simulator.net.folder","nets/junction-big/"));
     }
     
     @Override

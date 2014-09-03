@@ -1,7 +1,10 @@
 package cz.agents.highway.vanet;
 
+import cz.agents.highway.storage.plan.Action;
+
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
+import java.util.LinkedList;
 
 /**
  * Created by ondra on 13.8.14.
@@ -13,8 +16,10 @@ public class Status {
     private int ID;
     private Point3f position;
     private Vector3f velocity;
-
+    private double speed;
+    private double timeUpdate;
     private String message;
+    private LinkedList<Action> actions;
 
     public Status(String message){
         this.message = message;
@@ -28,8 +33,10 @@ public class Status {
     public String toString() {
         String statesToPrint = "";
         statesToPrint += "\nobject ID " + getID();
+        statesToPrint += "\ntime of Update " + getTimeUpdate();
         statesToPrint += "\nobject position " + getPosition();
         statesToPrint += "\nobject velocity " + getVelocity();
+        statesToPrint += "\nobject speed " + getSpeed();
         statesToPrint += "\nobject message " + getMessage();
         return statesToPrint;
     }
@@ -65,4 +72,30 @@ public class Status {
     public void setVelocity(Vector3f velocity) {
         this.velocity = velocity;
     }
+
+    public double getTimeUpdate() {
+        return timeUpdate;
+    }
+
+    public void setTimeUpdate(double timeUpdate) {
+        this.timeUpdate = timeUpdate;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public LinkedList<Action> getActions() {
+        return actions;
+    }
+
+    public void setActions(LinkedList<Action> actions) {
+        this.actions = actions;
+    }
+
+
 }

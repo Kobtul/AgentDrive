@@ -3,6 +3,7 @@ package cz.agents.highway.vanet;
 import cz.agents.alite.common.event.Event;
 import cz.agents.alite.environment.eventbased.EventBasedStorage;
 import cz.agents.alite.simulation.SimulationEventType;
+import cz.agents.highway.agent.Agent;
 import cz.agents.highway.environment.HighwayEnvironment;
 import cz.agents.highway.storage.HighwayEventType;
 import cz.agents.highway.storage.RadarData;
@@ -17,27 +18,32 @@ import java.util.*;
  * Main class of vanet system which connect objects by settled rules.
  */
 public class Vanet  extends EventBasedStorage {
-    final double MAX_CONNECTION_DIST = 100;
-    final int UPDATE_TIME_INTERVAL = 1000;
+    final double MAX_CONNECTION_DIST = 30;
     private final Logger logger = Logger.getLogger(Vanet.class);
 
+    private HighwayEnvironment environment;
+
     private int lastUpdate = 0;
+    private Map<Integer, Agent> agents;
     private final Map<Integer, RoadObject> includedObjects = new LinkedHashMap<Integer, RoadObject>();
     private final Map<Integer, ArrayList<RoadObject>> connectedObjects = new LinkedHashMap<Integer, ArrayList<RoadObject>>();
     private final Map<Integer, Status> states = new HashMap<Integer, Status>();
+    private  LinkedHashMap<Integer, Collection<Status>> distribStates = new LinkedHashMap<Integer, Collection<Status>>();
 
-    public Vanet(HighwayEnvironment environment){
+    public Vanet(HighwayEnvironment environment,Map<Integer, Agent> agents){
         super(environment);
         environment.getEventProcessor().addEventHandler(this);
+        this.environment = environment;
+        this.agents = agents;
     }
 
     @Override
     public void handleEvent(Event event) {
 
         if (event.isType(SimulationEventType.SIMULATION_STARTED)) {
-            logger.debug("Vanet: handled simulation START");
+            logger.info("Vanet: handled simulation START");
         }else if(event.isType(HighwayEventType.RADAR_DATA)){
-            logger.debug("Vanet: handled: RADAR_DATA");
+            logger.info("Vanet: handled: RADAR_DATA");
             RadarData radar_data = (RadarData) event.getContent();
             updateObjects(radar_data);
         }
@@ -48,7 +54,10 @@ public class Vanet  extends EventBasedStorage {
         int carId = object.getId();
         includedObjects.put(carId, object);
         connectedObjects.put(carId, new ArrayList<RoadObject>());
-        states.put(carId, object.getStatus());
+        Status st = object.getStatus();
+        st.setActions(agents.get(carId).getNavigator().getNextActionsWithReset(object));
+        states.put(carId, st);
+
     }
     public void removeObject(RoadObject object){
         includedObjects.remove(object);
@@ -59,7 +68,7 @@ public class Vanet  extends EventBasedStorage {
         for (RoadObject object : objects.getCars()) {
             updateObject(object);
         }
-        logger.debug("Vanet updated vehicles: received " + objects);
+        logger.info("Vanet updated vehicles: received " + objects);
 
         for (RoadObject object : includedObjects.values()) {
             for (RoadObject roadObject : includedObjects.values()){
@@ -74,8 +83,7 @@ public class Vanet  extends EventBasedStorage {
                 }
             }
         }
-
-        distributeStates();
+        distribStates = distributeStates();
     }
 
     public LinkedHashMap<Integer, Collection<Status>> distributeStates(){
@@ -112,5 +120,8 @@ public class Vanet  extends EventBasedStorage {
         return connectedObjects;
     }
 
+    public Collection<Status> getConnectedStates(int id){
+        return distribStates.get(id);
+    }
 
 }

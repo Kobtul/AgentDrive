@@ -141,7 +141,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                         }
                         vel.scale(1f / (float) duration);
                         int lane = highwayEnvironment.getRoadNetwork().getLaneNum(wpAction.getPosition());
-                        state = new RoadObject(carID, duration, lane, wpAction.getPosition(), vel);
+                        state = new RoadObject(carID, duration, lane, wpAction.getPosition(), vel, wpAction.getSpeed());
 
                     }
                 }
@@ -207,7 +207,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                 if (agents.containsKey(vehicleID)) {
                     agent = agents.get(vehicleID);
                 } else {
-                    agent = storage.createAgent(vehicleID);
+                    agent = storage.createAgent(vehicleID,vanet);
                 }
                 Point2f position = agent.getNavigator().next();
                 for (int j = 0; j < initPos.size(); j++) {
@@ -226,13 +226,13 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                 Vector3f initialVelocity = agent.getInitialVelocity();
 
                 int lane = highwayEnvironment.getRoadNetwork().getLaneNum(initialPosition);
-                update.add(new RoadObject(vehicleID, 0d, lane, initialPosition, initialVelocity));
+                update.add(new RoadObject(vehicleID, 0d, lane, initialPosition, initialVelocity, 25));
 
             }
             simulatorHandlers.add(new LocalSimulatorHandler(null, new HashSet<Integer>(vehicles)));
-
+            System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
             vanet.updateObjects(update);
-            storage.updateCars(update, vanet.distributeStates());
+            storage.updateCars(update);
         }
 
         // Divide vehicles evenly to the simulators
@@ -257,7 +257,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                     if (agents.containsKey(vehicleID)) {
                         agent = agents.get(vehicleID);
                     } else {
-                        agent = storage.createAgent(vehicleID);
+                        agent = storage.createAgent(vehicleID,highwayEnvironment.getVanet());
                     }
 
                     Point2f position = agent.getNavigator().next();
@@ -278,7 +278,7 @@ public class DashBoardController extends DefaultCreator implements EventHandler,
                         plans.addAction(new WPAction(vehicleID, 0d, initialPosition, initialVelocity.length()));
                         plannedVehicles.add(vehicleID);
                     } else {
-                        update.add(new RoadObject(vehicleID, 0d, lane, initialPosition, initialVelocity));
+                        update.add(new RoadObject(vehicleID, 0d, lane, initialPosition, initialVelocity, 25));
                     }
 
 //

@@ -50,4 +50,5 @@ public class Agent extends Entity {
         return new Vector3f(1, 1, 0);
     }
 
+
 }
