@@ -10,8 +10,8 @@ highway {
 //    agent = "ORCAAgent";
 
     net {
-        folder = "nets/x-junction/";
-//        folder = "nets/junction-big/";
+//        folder = "nets/x-junction/";
+        folder = "nets/junction-big/";
 //        folder = "nets/highway-straight/";
     }
     safeDistanceAgent {
